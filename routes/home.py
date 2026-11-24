@@ -994,6 +994,8 @@ def login_request():
         flash(f'Muitas tentativas. Tente novamente em {minutos} minuto(s).', 'error')
         return redirect(url_for('home.login'))
 
+    print(cliente_id)    
+
     try:
         #* 1. Consulta no banco MASTER
         resp = (

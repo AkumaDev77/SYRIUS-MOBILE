@@ -14,7 +14,8 @@ dotenv_path = os.path.join(
 load_dotenv(dotenv_path)
 
 url = os.getenv("SUPABASE_URL", "").strip()
-key = os.getenv("SUPABASE_KEY", "").strip()
+# Usa service_role se existir, senão cai para anon (ok p/ teste com RLS off)
+key = os.getenv("SUPABASE_SECRET_KEY") or os.getenv("SUPABASE_KEY")
 
 if not url or not key:
     raise ValueError(

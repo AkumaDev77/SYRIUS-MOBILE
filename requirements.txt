@@ -9,3 +9,4 @@ supafunc==0.9.3
 python-dotenv==1.0.1
 requests==2.32.4
 yfinance==0.2.61
+Flask-Limiter==3.12

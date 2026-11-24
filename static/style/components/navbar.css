@@ -1,0 +1,214 @@
+/* ============================
+   NAVBAR MOBILE
+============================ */
+
+.navbar-mobile {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+
+    height: 72px;
+
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+    background: rgba(36, 36, 36, 0.4);
+
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+
+    border: 1px solid rgba(255, 255, 255, .06);
+
+    border-radius: 24px;
+
+    box-shadow:
+        0 10px 35px rgba(0, 0, 0, .45),
+        inset 0 1px 0 rgba(255, 255, 255, .05);
+
+    z-index: 9999;
+
+    transition: all .35s cubic-bezier(.2, .8, .2, 1);
+
+    /* Garante que a navbar fique ACIMA do teclado no mobile */
+    transform: translateZ(0);
+}
+
+/* ============================
+   BOTÕES
+============================ */
+
+.nav-item {
+    position: relative;
+    width: 70px;
+    height: 56px;
+
+    border: none;
+    background: none;
+
+    border-radius: 18px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    gap: 4px;
+
+    color: var(--text-secondary);
+    cursor: pointer;
+
+    transition: .30s ease;
+    overflow: hidden;
+
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Círculo atrás do ícone */
+.nav-item::before {
+    content: "";
+    position: absolute;
+    width: 42px;
+    height: 42px;
+    top: 4px;
+    border-radius: 50%;
+    background: rgba(0, 217, 255, .15);
+    box-shadow: 0 0 20px rgba(0, 217, 255, .25);
+    transform: scale(0);
+    transition: .30s ease;
+}
+
+/* Barrinha inferior */
+.nav-item::after {
+    content: "";
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    width: 0;
+    height: 3px;
+    border-radius: 20px;
+    background: var(--primary);
+    transform: translateX(-50%);
+    transition: .30s ease;
+}
+
+/* ============================
+   ÍCONES
+============================ */
+
+.nav-item i {
+    position: relative;
+    z-index: 2;
+    font-size: 22px;
+    transition: .30s ease;
+}
+
+/* ============================
+   TEXTO
+============================ */
+
+.nav-item span {
+    position: relative;
+    z-index: 2;
+    font-size: 11px;
+    font-weight: 600;
+    opacity: .70;
+    transition: .30s ease;
+}
+
+/* ============================
+   ITEM ATIVO
+============================ */
+
+.nav-item.active {
+    color: var(--primary);
+}
+
+.nav-item.active::before {
+    transform: scale(1);
+}
+
+.nav-item.active::after {
+    width: 26px;
+}
+
+.nav-item.active span {
+    opacity: 1;
+}
+
+.nav-item.active i {
+    transform: translateY(-4px) scale(1.12);
+    text-shadow:
+        0 0 10px rgba(0, 217, 255, .65),
+        0 0 20px rgba(0, 217, 255, .30);
+    animation: navJump .35s ease;
+}
+
+/* ============================
+   HOVER
+============================ */
+
+.nav-item:hover {
+    color: white;
+}
+
+.nav-item:hover i {
+    transform: translateY(-2px);
+}
+
+/* ============================
+   ANIMAÇÃO
+============================ */
+
+@keyframes navJump {
+    0%   { transform: translateY(0)    scale(1);    }
+    45%  { transform: translateY(-8px) scale(1.22); }
+    100% { transform: translateY(-4px) scale(1.12); }
+}
+
+/* ============================
+   NAVBAR COMPACTA
+============================ */
+
+.navbar-mobile.compact {
+    left: 28px;
+    right: 28px;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    height: 60px;
+    border-radius: 20px;
+    background: rgba(20, 20, 20, .72);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, .35),
+        inset 0 1px 0 rgba(255, 255, 255, .04);
+}
+
+.navbar-mobile.compact .nav-item {
+    width: 62px;
+    height: 50px;
+}
+
+.navbar-mobile.compact .nav-item i {
+    font-size: 20px;
+}
+
+.navbar-mobile.compact .nav-item span {
+    opacity: 0;
+    transform: translateY(6px);
+    font-size: 9px;
+}
+
+.navbar-mobile.compact .nav-item::before {
+    width: 38px;
+    height: 38px;
+}
+
+.nav-item,
+.nav-item::before,
+.nav-item::after,
+.nav-item i,
+.nav-item span {
+    transition: all .30s cubic-bezier(.2, .8, .2, 1);
+}

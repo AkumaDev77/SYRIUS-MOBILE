@@ -1,0 +1,206 @@
+/* ============================================================
+   THEME / GLOBAL / RESET MOBILE
+   ============================================================ */
+
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+}
+
+/* Altura dinâmica + sem scroll no body (cada .page gerencia o seu) */
+html,
+body {
+    height: 100%;
+    height: 100dvh;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    overscroll-behavior: none;
+    background: rgb(10, 10, 10);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Libera seleção onde faz sentido */
+input,
+textarea,
+.message-text,
+p,
+span,
+a {
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+/* Evita zoom automático em inputs no iOS */
+input,
+textarea,
+select {
+    font-size: 16px;
+}
+
+/* ============================================================
+   APP LAYOUT (raiz do app)
+   ============================================================ */
+
+#app {
+    position: relative;
+    height: 100dvh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#content {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    /* Reserva espaço da navbar flutuante + safe area */
+    padding-bottom: calc(72px + 16px + env(safe-area-inset-bottom, 0px));
+}
+
+/* ============================================================
+   PÁGINAS
+   ============================================================ */
+
+.page {
+    position: absolute;
+    inset: 0;
+    display: none;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+}
+
+.page.active {
+    display: block;
+}
+
+/* A página do bot NÃO rola — quem rola é o .messages-area */
+#bot-page {
+    overflow: hidden;
+}
+
+/* ============================================================
+   LOGIN (body usado como container centralizador)
+   Aplicado só quando NÃO existe #app (página de login standalone)
+   ============================================================ */
+
+body.login-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 20px;
+    padding-top: max(24px, env(safe-area-inset-top));
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+}
+
+/* ============================================================
+   ÍCONES
+   ============================================================ */
+
+i {
+    color: #ffffff;
+}
+
+/* ============================================================
+   BOTÕES
+   ============================================================ */
+
+.btn-principal {
+    background: linear-gradient(135deg, #6c63ff 0%, #8b5cf6 100%);
+    border: none;
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.4px;
+    margin-top: 20px;
+}
+
+/* ============================================================
+   TEXTOS
+   ============================================================ */
+
+.labelInpt-w {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.labelInpt-b {
+    color: #000000;
+    font-weight: 600;
+}
+
+.title-primary {
+    text-align: center;
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    letter-spacing: 0.3px;
+}
+
+/* ============================================================
+   INPUTS
+   ============================================================ */
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 15px 16px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 14px;
+    color: #ffffff;
+    font-size: 16px; /* obrigatório p/ evitar zoom no iOS */
+    outline: none;
+    transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.input-group input::placeholder {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.input-group input:focus {
+    border-color: #00ddbc;
+    background: rgba(108, 99, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+}
+
+
+/* ============================================================
+   NAVBAR — esconder/mostrar com animação
+   ============================================================ */
+
+/* Estado escondido: desce, encolhe e some */
+.navbar-mobile.navbar-hidden {
+    transform: translateY(calc(100% + 32px + env(safe-area-inset-bottom, 0px))) scale(0.9);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Quando a navbar está escondida, o #content deixa de reservar espaço */
+#content.no-navbar-padding {
+    padding-bottom: 0;
+    transition: padding-bottom .35s cubic-bezier(.2,.8,.2,1);
+}
+
+/* Transição do padding-bottom quando volta */
+#content {
+    transition: padding-bottom .35s cubic-bezier(.2,.8,.2,1);
+}

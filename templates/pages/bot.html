@@ -1,0 +1,70 @@
+<div class="chat-container">
+    <!-- Header -->
+    <div class="chat-header">
+        <button class="btn-menu" id="btnToggleNavbar" aria-label="Mostrar menu">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <div class="avatar">
+            <i class="fas fa-robot"></i>
+        </div>
+
+        <div class="info">
+            <h2>Bot Financeiro</h2>
+            <p>Conectado ao Syrius</p>
+        </div>
+
+        <div class="status">
+            <span class="status-dot"></span>
+            <span style="font-size: 12px;">Online</span>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages-area" id="messagesArea">
+        <!-- Mensagem de boas-vindas -->
+        <div class="message-wrapper received">
+            <div class="message-bubble">
+                <div class="message-text" style="display: flex; flex-direction: column; align-items: flex-start;">
+                    <strong>Olá! 👋</strong><br>
+                    Sou seu assistente financeiro.<br><br>
+                    💡 Digite <strong>"/ajuda"</strong> para ver os comandos<br>
+                    ou apenas digite:<br>
+                    <strong>"Padaria 5,50"</strong> para um gasto<br>
+                    <strong>"ganho Freela 100"</strong> para uma receita
+                </div>
+                <div class="message-time">Agora</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <button class="btn-quick" onclick="sendMessage('/listar')">
+            📊 Listar
+        </button>
+        <button class="btn-quick" onclick="sendMessage('/ultimos 5')">
+            📋 Últimos 5
+        </button>
+        <button class="btn-quick" onclick="sendMessage('/saldo')">
+            💰 Saldo
+        </button>
+        <button class="btn-quick" onclick="sendMessage('/ajuda')">
+            ❓ Ajuda
+        </button>
+    </div>
+
+    <!-- Input -->
+    <div class="input-area">
+        <input 
+            type="text" 
+            id="messageInput" 
+            placeholder="Digite sua mensagem..." 
+            autofocus
+            onkeypress="if(event.key === 'Enter') sendMessage()"
+        >
+        <button class="btn-send" onclick="sendMessage()" title="Enviar">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+</div>

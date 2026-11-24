@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<!-- #region HEAD -->
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#1e1e2f" />
+    <title>Login</title>
+
+    <!--? Estilos -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/global/theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/pages/login.css') }}">
+</head>
+<!-- #endregion -->
+
+<!-- #region BODY -->
+<body id="page-login">
+
+    <div class="login-card">
+        <!-- LOGO -->
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='img/LOGO SYRIUS_DARK.png') }}" alt="Logo" class="logo" />
+        </div>
+
+        
+            <h2 class="title-primary">Bem-vindo(a)
+                <p style="font-size: 14px; font-weight: 500;">Faça Login para continuar.</p>
+            </h2>
+
+        <!-- Flash messages do Flask (erros/sucesso vindos do backend) -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-container">
+              {% for category, message in messages %}
+                <div class="flash flash-{{ category }}">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <!-- ✅ FORM CORRETO: method POST + action para /logrequest -->
+        <form id="login-form" method="POST" action="{{ url_for('home.login_request') }}" novalidate>
+            <div class="input-group">
+                <label class="labelInpt-w" for="cliente_id">Cliente ID</label>
+                <input
+                    type="text"
+                    id="cliente-id"
+                    name="cliente_id"
+                    placeholder="Cliente ID"
+                    inputmode="numeric"
+                    required />
+            </div>
+
+            <div class="input-group">
+                <label class="labelInpt-w" for="email">E-mail</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="E-mail"
+                    inputmode="email"
+                    autocomplete="email"
+                    required />
+            </div>
+
+            <div class="input-group">
+                <label class="labelInpt-w" for="email">senha</label>
+                <input
+                    type="password"
+                    id="senha"
+                    name="senha"
+                    placeholder="Senha"
+                    autocomplete="current-password"
+                    required />
+            </div>
+
+            <button type="submit" class="btn-login btn-principal" id="btn-login">
+                <span class="btn-text">Entrar</span>
+                <span class="btn-spinner" aria-hidden="true"></span>
+            </button>
+
+            <label class="remember-row">
+                <input type="checkbox" id="lembrar" name="lembrar" />
+                Lembrar usuário e senha
+            </label>
+        </form>
+    </div>
+
+    <!-- ===================== SCRIPT ===================== -->
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form      = document.getElementById('login-form');
+        const btn       = document.getElementById('btn-login');
+        const inputId   = document.getElementById('cliente-id');
+        const inputMail = document.getElementById('email');
+        const inputPwd  = document.getElementById('senha');
+        const lembrar   = document.getElementById('lembrar');
+
+        // -------- 1) "Lembrar usuário" (front-only por enquanto) --------
+        // Ao abrir a tela, se houver dados salvos, preenche os campos.
+        const lembrarSalvo = localStorage.getItem('finp_lembrar') === '1';
+        if (lembrarSalvo) {
+            lembrar.checked = true;
+            inputId.value   = localStorage.getItem('finp_cliente_id') || '';
+            inputMail.value = localStorage.getItem('finp_email')      || '';
+            // ⚠️ NUNCA guarde senha no localStorage (inseguro). Só ID e e-mail.
+        }
+
+        // -------- 2) Validação client-side antes de enviar --------
+        // Se algo estiver inválido, NÃO envia pro backend e mostra o erro.
+        function validar() {
+            const id   = inputId.value.trim();
+            const mail = inputMail.value.trim();
+            const pwd  = inputPwd.value;
+
+            if (!id) {
+                alert('Informe o Cliente ID.');
+                inputId.focus();
+                return false;
+            }
+            if (!mail || !/^\S+@\S+\.\S+$/.test(mail)) {
+                alert('Informe um e-mail válido.');
+                inputMail.focus();
+                return false;
+            }
+            if (!pwd) {
+                alert('Informe a senha.');
+                inputPwd.focus();
+                return false;
+            }
+            return true;
+        }
+
+        // -------- 3) Submit: valida, salva "lembrar" e envia --------
+        form.addEventListener('submit', (e) => {
+            if (!validar()) {
+                e.preventDefault();
+                return;
+            }
+
+            // Salva/limpa preferências de "lembrar"
+            if (lembrar.checked) {
+                localStorage.setItem('finp_lembrar', '1');
+                localStorage.setItem('finp_cliente_id', inputId.value.trim());
+                localStorage.setItem('finp_email', inputMail.value.trim());
+            } else {
+                localStorage.removeItem('finp_lembrar');
+                localStorage.removeItem('finp_cliente_id');
+                localStorage.removeItem('finp_email');
+            }
+
+            // Feedback visual: desabilita botão e mostra spinner
+            btn.disabled = true;
+            btn.classList.add('loading');
+        });
+    });
+    </script>
+    <!-- ================================================= -->
+
+</body>
+<!-- #endregion -->
+
+</html>

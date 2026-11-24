@@ -1021,7 +1021,7 @@ def login_request():
             )
             return redirect(url_for('home.login'))
 
-        if cred.get('bloqexctmaster'):
+        if cred.get('bloq_exctmaster'):
             flash(
                 'Acesso bloqueado. Entre em contato com o suporte para mais informações.',
                 'error'

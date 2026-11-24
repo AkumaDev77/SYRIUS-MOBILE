@@ -3,7 +3,6 @@ gunicorn==21.2.0
 supabase==2.34.1
 postgrest==0.19.3
 gotrue==2.11.3
-storage3==0.11.3
 realtime==2.3.0
 supafunc==0.9.3
 python-dotenv==1.0.1

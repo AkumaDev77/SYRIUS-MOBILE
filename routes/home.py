@@ -940,6 +940,8 @@ def deletar_lancamento(id):
 #! Pagina de LOGIN
 @home_route.route('/')
 def login2():
+    if session.get('user_id'): # Se já estiver logado
+        return redirect(url_for('home.index'))
     return render_template('pages/login.html')
 
 
@@ -987,7 +989,10 @@ def login_request():
     #* 0. Conta já está bloqueada?
     bloqueado, minutos = _conta_bloqueada(chave)
     if bloqueado:
-        flash(f'Muitas tentativas. Tente novamente em {minutos} minuto(s).', 'error')
+        msg = f'Muitas tentativas. Tente novamente em {minutos} minuto(s).'
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.is_json:
+            return jsonify({"success": False, "message": msg}), 401
+        flash(msg, 'error')
         return redirect(url_for('home.login'))
 
     print(cliente_id)    
@@ -1004,7 +1009,10 @@ def login_request():
         )
 
         if not resp.data:
-            flash('Cliente ID não encontrado.', 'error')
+            msg = 'Cliente ID não encontrado.'
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.is_json:
+                return jsonify({"success": False, "message": msg}), 401
+            flash(msg, 'error')
             return redirect(url_for('home.login'))
 
         cred = resp.data[0]
@@ -1012,23 +1020,15 @@ def login_request():
         client_key = cred['api_key']
 
         #* 1.1 Verifica bloqueios administrativos ANTES de qualquer auth
-        if cred.get('bloq_total'):
-            flash(
-                'Acesso bloqueado. Entre em contato com o suporte para mais informações.',
-                'error'
-            )
-            return redirect(url_for('home.login'))
-
-        if cred.get('bloq_exctmaster'):
-            flash(
-                'Acesso bloqueado. Entre em contato com o suporte para mais informações.',
-                'error'
-            )
+        if cred.get('bloq_total') or cred.get('bloq_exctmaster'):
+            msg = 'Acesso bloqueado. Entre em contato com o suporte para mais informações.'
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.is_json:
+                return jsonify({"success": False, "message": msg}), 401
+            flash(msg, 'error')
             return redirect(url_for('home.login'))
 
         #* 2. Cria o cliente dinâmico (banco do cliente)
         cliente_db = criar_cliente_dinamico(client_url, client_key)
-
 
         #* 3. Autentica no Supabase Auth DO CLIENTE
         try:
@@ -1036,39 +1036,34 @@ def login_request():
                 "email": email,
                 "password": senha
             })
-
-
-
-
         except Exception as e:
             print("❌ AUTH ERRO:", e)
             count = _registrar_falha(chave)
 
+            msg = ''
             if count >= MAX_TENTATIVAS:
-                flash(
-                    f'Conta bloqueada por {TEMPO_BLOQUEIO_MINUTOS} minutos '
-                    f'devido a múltiplas tentativas incorretas.',
-                    'error'
-                )
+                msg = f'Conta bloqueada por {TEMPO_BLOQUEIO_MINUTOS} minutos devido a múltiplas tentativas incorretas.'
             else:
                 restantes = MAX_TENTATIVAS - count
-                flash(
-                    f'E-mail ou senha inválidos. '
-                    f'Restam {restantes} tentativa(s).',
-                    'error'
-                )
+                msg = f'E-mail ou senha inválidos. Restam {restantes} tentativa(s).'
+
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.is_json:
+                return jsonify({"success": False, "message": msg}), 401
+
+            flash(msg, 'error')
             return redirect(url_for('home.login'))
 
         user = auth_response.user
 
         if not user:
-            flash('Não foi possível autenticar. Verifique se o e-mail foi confirmado.', 'error')
+            msg = 'Não foi possível autenticar. Verifique se o e-mail foi confirmado.'
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.is_json:
+                return jsonify({"success": False, "message": msg}), 401
+            flash(msg, 'error')
             return redirect(url_for('home.login'))
 
-
         #* 3.1 Pegar informações de credenciais
-        nome_cliente = (user.app_metadata  or {}).get('name_user') or user.email
-
+        nome_cliente = (user.app_metadata or {}).get('name_user') or user.email
 
         #* 4. Sucesso → limpa tentativas e salva sessão
         _limpar_tentativas(chave)
@@ -1078,16 +1073,28 @@ def login_request():
         session['cliente_id']   = cliente_id
         session['user_id']      = user.id
         session['user_email']   = user.email
-        session['nome'] = nome_cliente
-        session['access_token']  = auth_response.session.access_token
-        session['refresh_token'] = auth_response.session.refresh_token  # opcional, mas recomendado
+        session['nome']         = nome_cliente
+        session['access_token'] = auth_response.session.access_token
+        session['refresh_token']= auth_response.session.refresh_token
 
+        # Retorna JSON se for requisição AJAX, senão mantém o redirect padrão
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.is_json:
+            return jsonify({
+                "success": True,
+                "message": f"Login OK! Bem-vindo, {nome_cliente}.",
+                "redirect": url_for('home.index')
+            })
+            
         flash(f'Login OK! Bem-vindo, {nome_cliente}.', 'success')
-        return redirect(url_for('home.index'))  # troque p/ home.dashboard quando criar
+        return redirect(url_for('home.index'))
 
+    # 👇 ESTE É O EXCEPT QUE ESTAVA FALTANDO
     except Exception as e:
         print("❌ ERRO GERAL:", e)
-        flash(f'Erro ao validar cliente: {e}', 'error')
+        msg = f'Erro ao validar cliente: {e}'
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.is_json:
+            return jsonify({"success": False, "message": msg}), 500
+        flash(msg, 'error')
         return redirect(url_for('home.login'))
 
 

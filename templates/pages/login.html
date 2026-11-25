@@ -145,9 +145,10 @@
         }
 
         // -------- 3) Submit: valida, salva "lembrar" e envia --------
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => { // 👈 Adicionado async
+            e.preventDefault(); // 👈 Impede o envio padrão do form
+            
             if (!validar()) {
-                e.preventDefault();
                 return;
             }
 
@@ -162,11 +163,46 @@
                 localStorage.removeItem('finp_email');
             }
 
-            // Feedback visual: desabilita botão e mostra spinner
+            // Feedback visual
             btn.disabled = true;
             btn.classList.add('loading');
+
+            try {
+                // Prepara os dados do formulário
+                const formData = new FormData();
+                formData.append('cliente_id', inputId.value.trim());
+                formData.append('email', inputMail.value.trim());
+                formData.append('senha', inputPwd.value);
+
+                // Envia via Fetch (AJAX) para não haver redirect 302 do servidor
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest' // Avisa o Flask que é AJAX
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    // Sucesso: Navega via JS (PWA mantém as barras ocultas)
+                    window.location.href = data.redirect;
+                } else {
+                    // Erro: Mostra a mensagem flash na tela sem recarregar
+                    alert(data.message || 'Erro ao fazer login');
+                    btn.disabled = false;
+                    btn.classList.remove('loading');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro de conexão. Tente novamente.');
+                btn.disabled = false;
+                btn.classList.remove('loading');
+            }
         });
     });
+    
     </script>
     <!-- ================================================= -->
 

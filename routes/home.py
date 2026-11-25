@@ -417,13 +417,20 @@ def _limpar_tentativas(chave: str) -> None:
     tentativas_falhas.pop(chave, None)
 
 def _get_cliente_db():
-    """Retorna o client Supabase do cliente logado (da sessão)."""
     if not session.get("supabase_url") or not session.get("supabase_key"):
         raise RuntimeError("Sessão sem credenciais do cliente")
-    return criar_cliente_dinamico(
+
+    cliente_db = criar_cliente_dinamico(
         session["supabase_url"],
         session["supabase_key"]
     )
+
+    access_token = session.get("access_token")
+    refresh_token = session.get("refresh_token", "")
+    if access_token:
+        cliente_db.auth.set_session(access_token, refresh_token)
+
+    return cliente_db
 
 
 def login_required(f):
@@ -957,17 +964,6 @@ def index():
 
 
 #region REALIZAR LOGIN/LOGOUT
-
-
-def _get_cliente_db():
-    """Retorna o client Supabase do cliente logado (da sessão)."""
-    if not session.get("supabase_url") or not session.get("supabase_key"):
-        raise RuntimeError("Sessão sem credenciais do cliente")
-    return criar_cliente_dinamico(
-        session["supabase_url"],
-        session["supabase_key"]
-    )
-
 
 @home_route.route('/logrequest', methods=['POST'])
 @limiter.limit("5 per minute")

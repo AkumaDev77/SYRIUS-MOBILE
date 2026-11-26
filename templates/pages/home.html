@@ -1,0 +1,77 @@
+<!-- Estrutura do App Mobile -->
+<div class="app-container">
+    
+    <!--! Cabeçalho -->
+    <header class="header-top">
+        
+        <div class="user-info">
+            <div class="avatar" id="user-avatar">#</div>
+            <div>
+                <span class="greeting" id="user-greeting">Boa tarde</span>
+                <span class="name">
+                    <span id="user-name">Usuário</span> 
+                    <span class="status-dot"></span>
+                </span>
+            </div>
+        </div>
+
+        <!--! Alternador Pessoal / Veículo -->
+        <div class="toggle-switch">
+            <!-- Adicionei IDs para controlar qual está ativo via JS -->
+            <div class="toggle-option active" id="toggle-pessoal" onclick="switchContext('pessoal')">Pessoal</div>
+            <div class="toggle-option" id="toggle-veiculo" onclick="switchContext('invest')">Investimentos</div>
+        </div>
+    </header>
+
+    <!--! Saldo Principal -->
+    <section class="balance-section">
+        <p class="balance-label" id="balance-month-label">Sobrou em novembro</p>
+        <h1 class="balance-value" id="balance-total">R$ 1.855,80</h1>
+
+        <div class="info-grid">
+
+            <div class="info-col">
+                <p class="info-label">Entrou</p>
+                <p class="info-value-green" id="balance-income">R$ 4.580,00</p>
+            </div>
+
+            <div class="info-col">
+                <p class="info-label">Saiu</p>
+                <p class="info-value-white" id="balance-current">R$ 2.724,20</p>
+            </div>
+
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar-bg">
+                <!-- A largura será controlada via JS -->
+                <div class="progress-fill" id="spent-progress-bar" style="width: 59%;"></div>
+            </div>
+            <p class="progress-text" id="spent-progress-text">Você gastou 59% do que entrou</p>
+        </div>
+    </section>
+
+    <!-- Seção Orçamento -->
+    <section class="budget-section">
+        <div class="budget-header">
+            <span id="budget-month-label">Orçamento de novembro</span>
+            <a href="#" class="budget-link">Ajustar</a>
+        </div>
+
+        <div class="card-budget">
+            <div class="budget-values">
+                <span class="budget-spent" id="budget-spent-value">R$ 1.516,20</span>
+                <span class="budget-total" id="budget-total-value">de R$ 1.770,00</span>
+                <span class="budget-percent" id="budget-percent-value">86%</span>
+            </div>
+            
+            <div class="progress-bar-bg">
+                <!-- A largura será controlada via JS -->
+                <div class="progress-fill progress-red" id="budget-progress-bar" style="width: 86%;"></div>
+            </div>
+            
+            <span class="warning-text" id="budget-warning-text">1 categoria estourou</span>
+        </div>
+    </section>
+
+</div>

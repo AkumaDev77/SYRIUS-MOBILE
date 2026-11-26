@@ -1,8 +1,6 @@
 /* ============================================================
-   BOT — página fullscreen no mobile.
+   BOT — página fullscreen no mobile (TEMA DARK)
    Escopado em #bot-page (não vaza pro resto do app).
-   A navbar flutuante NÃO cobre o chat — o #content já reserva
-   espaço pra ela via padding-bottom no theme.css.
    ============================================================ */
 
 #bot-page {
@@ -10,7 +8,7 @@
     width: 100%;
     padding: 0;
     overflow: hidden;
-    background: #000;
+    background: #0E0E0E;
 }
 
 #bot-page .chat-container {
@@ -18,13 +16,15 @@
     height: 100%;
     max-width: none;
     max-height: none;
-    background: #f0f2f5;
+    background: #0E0E0E;
     border-radius: 0;
     box-shadow: none;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     position: relative;
+    font-family: 'Inter', sans-serif;
+    color: #FFFFFF;
 }
 
 /* ============================
@@ -32,36 +32,44 @@
 ============================ */
 
 #bot-page .chat-header {
-    background: #075e54;
+    background: rgba(26, 26, 26, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px;
     display: flex;
     align-items: center;
     gap: 12px;
-    color: white;
+    color: #FFFFFF;
     flex-shrink: 0;
+    border-bottom: 1px solid #2E2E2E;
+    z-index: 2;
 }
 
 #bot-page .chat-header .avatar {
     width: 38px;
     height: 38px;
-    background: #128c7e;
+    background: linear-gradient(135deg, #4ADE80, #22A55E);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 18px;
+    color: #0E0E0E;
+    box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.15);
 }
 
 #bot-page .chat-header .info h2 {
     font-size: 15px;
     font-weight: 600;
     margin: 0;
+    color: #FFFFFF;
 }
 
 #bot-page .chat-header .info p {
     font-size: 11px;
-    opacity: 0.8;
+    opacity: 0.65;
     margin: 0;
+    color: #A0A0A0;
 }
 
 #bot-page .chat-header .status {
@@ -69,6 +77,13 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    background: rgba(74, 222, 128, 0.08);
+    border: 1px solid rgba(74, 222, 128, 0.22);
+    padding: 5px 10px;
+    border-radius: 999px;
+    color: #4ADE80;
+    font-size: 11px;
+    font-weight: 500;
 }
 
 #bot-page .chat-header .btn-menu {
@@ -76,8 +91,8 @@
     height: 38px;
     border: none;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.12);
-    color: #fff;
+    background: rgba(255, 255, 255, 0.06);
+    color: #FFFFFF;
     font-size: 16px;
     display: flex;
     align-items: center;
@@ -89,25 +104,24 @@
 }
 
 #bot-page .chat-header .btn-menu:active {
-    background: rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.14);
     transform: scale(0.92);
 }
 
-#bot-page .chat-header .btn-menu i {
-    color: #fff; /* garante que o ícone branco não seja sobrescrito */
-}
+#bot-page .chat-header .btn-menu i { color: #FFFFFF; }
 
 #bot-page .status-dot {
-    width: 8px;
-    height: 8px;
-    background: #4caf50;
+    width: 7px;
+    height: 7px;
+    background: #4ADE80;
     border-radius: 50%;
-    animation: bot-pulse 1.5s ease-in-out infinite;
+    box-shadow: 0 0 8px #4ADE80;
+    animation: bot-pulse 1.8s ease-in-out infinite;
 }
 
 @keyframes bot-pulse {
     0%, 100% { opacity: 1; }
-    50%      { opacity: 0.3; }
+    50%      { opacity: 0.35; }
 }
 
 /* ============================
@@ -116,19 +130,21 @@
 
 #bot-page .messages-area {
     flex: 1;
-    min-height: 0; /* essencial p/ flex child rolar */
+    min-height: 0;
     padding: 16px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
-    background: #e5ddd5;
-    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d1c7b8' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    background:
+        linear-gradient(rgba(14, 14, 14, 0.30), rgba(14, 14, 14, 0.30)),
+        url("/static/img/FUNDO_BOT.png") center / 100% auto no-repeat,
+        #0E0E0E;
 }
 
 #bot-page .messages-area::-webkit-scrollbar { width: 4px; }
 #bot-page .messages-area::-webkit-scrollbar-track { background: transparent; }
 #bot-page .messages-area::-webkit-scrollbar-thumb {
-    background: #c0c0c0;
+    background: #333;
     border-radius: 10px;
 }
 
@@ -152,21 +168,26 @@
 
 #bot-page .message-bubble {
     max-width: 80%;
-    padding: 9px 13px;
-    border-radius: 10px;
+    padding: 10px 14px;
+    border-radius: 16px;
     position: relative;
     word-wrap: break-word;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
+/* Usuário (enviado) — verde sólido */
 #bot-page .message-wrapper.sent .message-bubble {
-    background: #dcf8c6;
-    border-bottom-right-radius: 2px;
+    background: #4ADE80;
+    color: #0E0E0E;
+    border-bottom-right-radius: 4px;
 }
 
+/* Bot (recebido) — cinza escuro */
 #bot-page .message-wrapper.received .message-bubble {
-    background: white;
-    border-bottom-left-radius: 2px;
+    background: #2A2A2A;
+    color: #FFFFFF;
+    border: 1px solid #333;
+    border-bottom-left-radius: 4px;
 }
 
 #bot-page .message-bubble .message-text {
@@ -176,44 +197,55 @@
 }
 
 #bot-page .message-bubble .message-text strong {
-    color: #075e54;
+    color: #FACC15;
+    font-weight: 600;
+}
+
+#bot-page .message-wrapper.sent .message-bubble .message-text strong {
+    color: #0E0E0E;
+    text-decoration: underline;
 }
 
 #bot-page .message-bubble .message-time {
     font-size: 10px;
-    color: #888;
-    margin-top: 3px;
+    color: #6B6B6B;
+    margin-top: 4px;
     text-align: right;
 }
 
+#bot-page .message-wrapper.sent .message-bubble .message-time {
+    color: rgba(0, 0, 0, 0.55);
+}
+
+/* Estados especiais — versão dark */
 #bot-page .message-bubble.system {
-    background: #e8f0fe;
-    border: 1px solid #c5d5e6;
-    color: #1a3b5c;
+    background: #1B2A3B;
+    border: 1px solid #2E4A66;
+    color: #B8D4F0;
 }
 
 #bot-page .message-bubble.success {
-    background: #d4edda;
-    border: 1px solid #c3e6cb;
-    color: #155724;
+    background: #14331F;
+    border: 1px solid #1F5C34;
+    color: #A8E6BC;
 }
 
 #bot-page .message-bubble.error {
-    background: #f8d7da;
-    border: 1px solid #f5c6cb;
-    color: #721c24;
+    background: #3A1618;
+    border: 1px solid #6E2629;
+    color: #F5B5B9;
 }
 
 #bot-page .message-bubble.lista {
-    background: #fff3cd;
-    border: 1px solid #ffeaa7;
-    color: #856404;
+    background: #332B10;
+    border: 1px solid #6B5A1E;
+    color: #F5DE8A;
 }
 
 #bot-page .message-bubble.saldo {
-    background: #d1ecf1;
-    border: 1px solid #bee5eb;
-    color: #0c5460;
+    background: #103037;
+    border: 1px solid #1F5A66;
+    color: #A8E1EA;
 }
 
 /* ============================
@@ -221,40 +253,38 @@
 ============================ */
 
 #bot-page .quick-actions {
-    padding: 8px 12px;
-    background: #f0f2f5;
+    padding: 10px 12px;
+    background: transparent;
     display: flex;
     gap: 6px;
     flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid #2E2E2E;
     flex-shrink: 0;
 }
 
-#bot-page .quick-actions::-webkit-scrollbar {
-    display: none;
-}
+#bot-page .quick-actions::-webkit-scrollbar { display: none; }
 
 #bot-page .quick-actions .btn-quick {
-    padding: 6px 12px;
-    border: none;
-    border-radius: 14px;
-    background: white;
-    color: #075e54;
+    padding: 8px 14px;
+    border: 1px solid #2E2E2E;
+    border-radius: 999px;
+    background: #1A1A1A;
+    color: #A0A0A0;
     font-size: 12px;
     font-weight: 500;
     white-space: nowrap;
     cursor: pointer;
-    transition: background 0.15s, color 0.15s, transform 0.15s;
+    transition: all 0.15s;
     font-family: 'Inter', sans-serif;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     -webkit-tap-highlight-color: transparent;
 }
 
 #bot-page .quick-actions .btn-quick:active {
-    background: #075e54;
-    color: white;
+    background: #4ADE80;
+    border-color: #4ADE80;
+    color: #0E0E0E;
     transform: scale(0.96);
 }
 
@@ -263,9 +293,11 @@
 ============================ */
 
 #bot-page .input-area {
-    padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
-    background: #f0f2f5;
-    border-top: 1px solid #e0e0e0;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+    background: rgba(26, 26, 26, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid #2E2E2E;
     display: flex;
     gap: 8px;
     align-items: center;
@@ -274,21 +306,27 @@
 
 #bot-page .input-area input {
     flex: 1;
-    padding: 10px 16px;
-    border: none;
-    border-radius: 22px;
-    font-size: 16px; /* ← 16px evita zoom no iOS */
+    padding: 12px 18px;
+    border: 1px solid #2E2E2E;
+    border-radius: 999px;
+    font-size: 16px; /* evita zoom no iOS */
     outline: none;
-    background: white;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    background: #222;
+    color: #FFFFFF;
     font-family: 'Inter', sans-serif;
-    transition: box-shadow 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     -webkit-appearance: none;
     appearance: none;
 }
 
+#bot-page .input-area input::placeholder {
+    color: #6B6B6B;
+}
+
 #bot-page .input-area input:focus {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    border-color: #4ADE80;
+    background: #1E1E1E;
+    box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.1);
 }
 
 #bot-page .input-area .btn-send {
@@ -297,19 +335,20 @@
     min-width: 44px;
     border: none;
     border-radius: 50%;
-    background: #075e54;
-    color: white;
+    background: #4ADE80;
+    color: #0E0E0E;
     font-size: 17px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.15s, transform 0.15s;
+    transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
     -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 4px 14px rgba(74, 222, 128, 0.3);
 }
 
 #bot-page .input-area .btn-send:active {
-    background: #128c7e;
+    background: #3FCC70;
     transform: scale(0.94);
 }
 
@@ -319,12 +358,13 @@
 
 #bot-page .typing-indicator {
     display: none;
-    padding: 8px 14px;
-    background: white;
-    border-radius: 10px;
+    padding: 10px 14px;
+    background: #2A2A2A;
+    border: 1px solid #333;
+    border-radius: 16px;
     margin-bottom: 10px;
     max-width: 60px;
-    border-bottom-left-radius: 2px;
+    border-bottom-left-radius: 4px;
 }
 
 #bot-page .typing-indicator.active {
@@ -336,7 +376,7 @@
     display: inline-block;
     width: 7px;
     height: 7px;
-    background: #999;
+    background: #A0A0A0;
     border-radius: 50%;
     margin: 0 2px;
     animation: bot-typing 1.4s infinite both;

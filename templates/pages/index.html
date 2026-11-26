@@ -12,6 +12,18 @@
 
     <link rel="manifest" href="/static/manifest.json">
 
+        <!-- Importação de fonte para ficar mais moderno (opcional, remova se já tiver) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Importação de ícones (Phosphor Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js');
+        }
+    </script>
+    
     <!-- Tema -->
     <meta name="theme-color" content="#1e1e2f" />
 
@@ -30,6 +42,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style/components/navbar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style/pages/index.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style/pages/bot.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/pages/home.css') }}">
     <!-- Pages -->
 
 
@@ -44,17 +57,12 @@
 
             <!-- INDEX -->
             <section id="home-page" class="page active">
-
+                {% include 'pages/home.html' %}
             </section>
 
             <!-- BOT -->
             <section id="bot-page" class="page">
                 {% include 'pages/bot.html' %}
-            </section>
-
-            <!-- ANALYTICS -->
-            <section id="analytic-page" class="page">
-
             </section>
 
             <!-- TAREFAS -->
@@ -64,11 +72,6 @@
 
             <!-- CARRO -->
             <section id="carro-page" class="page">
-                ...
-            </section>
-
-           <!-- MAIS -->
-            <section id="mais-page" class="page">
                 ...
             </section>
 
@@ -85,29 +88,21 @@
 
             <button class="nav-item" data-page="bot-page">
                 <i class="fa-solid fa-robot"></i>
-                <!-- <span>Analytics</span> -->
+                
             </button>
 
-            <button class="nav-item" data-page="analytic-page">
-                <i class="bi bi-graph-up"></i>
-                <!-- <span>Relatórios</span> -->
-            </button>
 
             <button class="nav-item" data-page="tarefas-page">
                 <i class="fa-solid fa-list-check"></i>
-                <!-- <span>Relatórios</span> -->
+                
             </button>
 
 
             <button class="nav-item" data-page="carro-page">
                 <i class="fa-solid fa-car-side"></i>
-                <!-- <span>Relatórios</span> -->
+                
             </button>
 
-            <button class="nav-item" data-page="mais-page">
-                <i class="bi bi-grid"></i>
-                <!-- <span>Mais</span> -->
-            </button>
 
         </nav>
         <!-- #endregion -->
@@ -118,12 +113,9 @@
 
     <script src="{{ url_for('static', filename='script/components/navbar.js') }}"></script>
     <script src="{{ url_for('static', filename='script/pages/bot.js') }}"></script>
+    <script src="{{ url_for('static', filename='script/pages/home.js') }}"></script>
 
-    <script>
-        if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("/static/service-worker.js");
-        }
-    </script>
+
 
 
 </body>

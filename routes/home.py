@@ -11,6 +11,7 @@ import yfinance as yf
 import re
 from difflib import get_close_matches
 from functools import wraps
+from flask import make_response, send_from_directory
 
 
 home_route = Blueprint('home', __name__)
@@ -181,6 +182,20 @@ ABREVIACOES = {
     'pis': 'Pis/Pasep',
 }
 
+
+@home_route.route('/service-worker.js')
+def service_worker():
+    response = make_response(
+        send_from_directory(
+            home_route.static_folder,
+            'service-worker.js'
+        )
+    )
+
+    response.headers['Content-Type'] = 'application/javascript'
+    response.headers['Service-Worker-Allowed'] = '/'
+
+    return response
 
 
 #! CACHE DO CADASTRO
@@ -960,10 +975,122 @@ def index():
 
 
 
+#region API HOME 
 
 
 
 
+
+
+def home_getData(cliente_db, limite=None):
+    try:
+        # ---------- 1. Nome do usuário ----------
+        nome = session.get('nome')
+        if not nome:
+            return jsonify({'error': 'Usuário não autenticado'}), 401
+
+        nome = nome.strip()
+        inicial = nome[0].upper() if nome else '?'
+
+        # ---------- 2. Saudação pela hora ----------
+        hora = datetime.now().hour
+        if 5 <= hora < 12:
+            saudacao = 'Bom dia'
+        elif 12 <= hora < 18:
+            saudacao = 'Boa tarde'
+        else:
+            saudacao = 'Boa noite'
+
+        # ---------- 3. Mês atual (pt-BR) ----------
+        meses = [
+            'janeiro', 'fevereiro', 'março', 'abril',
+            'maio', 'junho', 'julho', 'agosto',
+            'setembro', 'outubro', 'novembro', 'dezembro'
+        ]
+
+        hoje = datetime.now()
+        mes_atual = meses[hoje.month - 1]
+        id_mes_atual = hoje.month
+        ano_atual = str(hoje.year)
+
+        # ---------- 4. Consulta no banco (mês atual) ----------
+        query = (
+            cliente_db
+            .table('finp_movfin')
+            .select('tipo, valor')
+            .eq('id_mes', id_mes_atual)
+            .eq('ano', ano_atual)
+        )
+
+        if limite:
+            query = query.limit(limite)
+
+        result = query.execute()
+        lancamentos = result.data or []
+
+        # ---------- 5. Calcula entradas e saídas ----------
+        total_entrada = 0.0
+        total_saida = 0.0
+
+        for item in lancamentos:
+            valor = float(item.get('valor') or 0)
+            tipo = (item.get('tipo') or '').strip()
+
+            if tipo == 'Entrada':
+                total_entrada += valor
+            elif tipo == 'Saida':
+                total_saida += valor
+
+        saldo_mes = total_entrada - total_saida
+
+        # ---------- 6. Percentual gasto ----------
+        # Se entrou R$ 1000 e saiu R$ 590 → gastou 59%
+        percentual_gasto = 0
+        if total_entrada > 0:
+            percentual_gasto = round((total_saida / total_entrada) * 100)
+
+
+        # ---------- 7. Retorno ----------
+        return jsonify({
+            'nome': nome,
+            'avatar': inicial,
+            'saudacao': saudacao,
+            'mes': mes_atual,
+
+            # dados financeiros do mês
+            'total_entrada': round(total_entrada, 2),
+            'total_saida': round(total_saida, 2),
+            'saldo_mes': round(saldo_mes, 2),
+            'percentual_gasto': percentual_gasto
+        }), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
+
+
+@home_route.route('/api/home', methods=['GET'])
+@login_required
+def api_home():
+    try:
+        # ajuste 'get_db' para o nome do seu cliente_db
+        cliente_db = _get_cliente_db()
+        return home_getData(cliente_db)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
+
+
+
+
+
+
+
+#endregion
 
 #region REALIZAR LOGIN/LOGOUT
 
@@ -1063,7 +1190,9 @@ def login_request():
             return redirect(url_for('home.login'))
 
         #* 3.1 Pegar informações de credenciais
-        nome_cliente = (user.app_metadata or {}).get('name_user') or user.email
+        nome_cliente = (user.user_metadata or {}).get('user_name')
+
+        print(nome_cliente)
 
         #* 4. Sucesso → limpa tentativas e salva sessão
         _limpar_tentativas(chave)

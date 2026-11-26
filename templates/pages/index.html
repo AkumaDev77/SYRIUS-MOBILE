@@ -19,15 +19,7 @@
 
 
     <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js')
-                .then(registration => {
-                    console.log('Service Worker registrado:', registration.scope);
-                })
-                .catch(error => {
-                    console.error('Erro ao registrar Service Worker:', error);
-                });
-        }
+        navigator.serviceWorker.register('/service-worker.js');
     </script>
 
     <!-- Tema -->
@@ -55,30 +47,6 @@
 </head>
 
 <body>
-
-    <script>
-        console.log('================================');
-        console.log('SYRIUS PWA - DIAGNÓSTICO');
-
-        console.log('URL:', location.href);
-
-        console.log(
-            'Standalone:',
-            window.matchMedia('(display-mode: standalone)').matches
-        );
-
-        console.log(
-            'Display:',
-            window.matchMedia('(display-mode: browser)').matches
-        );
-
-        console.log(
-            'Service Worker:',
-            navigator.serviceWorker.controller
-        );
-
-        console.log('================================');
-    </script>
 
     <!-- #region CONTEUDO DAS PAGINAS -->
     <div id="app">

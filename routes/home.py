@@ -11,7 +11,7 @@ import yfinance as yf
 import re
 from difflib import get_close_matches
 from functools import wraps
-from flask import make_response, send_from_directory
+from flask import make_response, send_from_directory, current_app
 
 
 home_route = Blueprint('home', __name__)
@@ -196,9 +196,6 @@ def service_worker():
 
     return response
 
-
-
-from flask import current_app, send_from_directory
 
 @home_route.route('/manifest.json')
 def manifest():

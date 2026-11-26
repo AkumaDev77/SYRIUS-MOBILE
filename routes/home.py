@@ -185,17 +185,29 @@ ABREVIACOES = {
 
 @home_route.route('/service-worker.js')
 def service_worker():
-    response = make_response(
-        send_from_directory(
-            home_route.static_folder,
-            'service-worker.js'
-        )
+
+    response = send_from_directory(
+        current_app.static_folder,
+        'service-worker.js',
+        mimetype='application/javascript'
     )
 
-    response.headers['Content-Type'] = 'application/javascript'
     response.headers['Service-Worker-Allowed'] = '/'
 
     return response
+
+
+
+from flask import current_app, send_from_directory
+
+@home_route.route('/manifest.json')
+def manifest():
+    return send_from_directory(
+        current_app.root_path,
+        'manifest.json',
+        mimetype='application/manifest+json'
+    )
+
 
 
 #! CACHE DO CADASTRO

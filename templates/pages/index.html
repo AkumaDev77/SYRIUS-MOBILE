@@ -50,6 +50,30 @@
 
 <body>
 
+    <script>
+        console.log('================================');
+        console.log('SYRIUS PWA - DIAGNÓSTICO');
+
+        console.log('URL:', location.href);
+
+        console.log(
+            'Standalone:',
+            window.matchMedia('(display-mode: standalone)').matches
+        );
+
+        console.log(
+            'Display:',
+            window.matchMedia('(display-mode: browser)').matches
+        );
+
+        console.log(
+            'Service Worker:',
+            navigator.serviceWorker.controller
+        );
+
+        console.log('================================');
+    </script>
+
     <!-- #region CONTEUDO DAS PAGINAS -->
     <div id="app">
 

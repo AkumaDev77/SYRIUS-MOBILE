@@ -973,7 +973,7 @@ def index():
 
 def home_getData(cliente_db, limite=None):
     try:
-        # ---------- 1. Nome do usuário ----------
+        #! ---------- 1. Nome do usuário ----------
         nome = session.get('nome')
         if not nome:
             return jsonify({'error': 'Usuário não autenticado'}), 401
@@ -981,7 +981,7 @@ def home_getData(cliente_db, limite=None):
         nome = nome.strip()
         inicial = nome[0].upper() if nome else '?'
 
-        # ---------- 2. Saudação pela hora ----------
+        #! ---------- 2. Saudação pela hora ----------
         hora = datetime.now().hour
         if 5 <= hora < 12:
             saudacao = 'Bom dia'
@@ -990,7 +990,7 @@ def home_getData(cliente_db, limite=None):
         else:
             saudacao = 'Boa noite'
 
-        # ---------- 3. Mês atual (pt-BR) ----------
+        #! ---------- 3. Mês atual (pt-BR) ----------
         meses = [
             'janeiro', 'fevereiro', 'março', 'abril',
             'maio', 'junho', 'julho', 'agosto',
@@ -1002,22 +1002,52 @@ def home_getData(cliente_db, limite=None):
         id_mes_atual = hoje.month
         ano_atual = str(hoje.year)
 
-        # ---------- 4. Consulta no banco (mês atual) ----------
-        query = (
-            cliente_db
-            .table('finp_movfin')
-            .select('tipo, valor')
-            .eq('id_mes', id_mes_atual)
-            .eq('ano', ano_atual)
+    #! --- 4. Consulta no banco (mês atual) com paginação ----------
+        page_size = 1000
+
+        def get_supabase(cliente_db, tabela, colunas, id_mes_atual, ano_atual):
+            """Busca todas as linhas da tabela paginando via range."""
+            registros = []
+            offset = 0
+
+            while True:
+                result = (
+                    cliente_db
+                    .table(tabela)
+                    .select(colunas)
+                    .eq('id_mes', id_mes_atual)
+                    .eq('ano', ano_atual)
+                    .order('id', desc=False)  # obrigatório para paginação estável
+                    .range(offset, offset + page_size - 1)
+                    .execute()
+                )
+                dados_pagina = result.data or []
+
+                if not dados_pagina:
+                    break
+
+                registros.extend(dados_pagina)
+
+                if len(dados_pagina) < page_size:
+                    break
+
+                offset += page_size
+            return registros
+
+
+        #!4.1 Movimentos financeiros
+        lancamentos = get_supabase(
+            cliente_db, 'finp_movfin', '*', id_mes_atual, ano_atual
         )
 
-        if limite:
-            query = query.limit(limite)
+        #!4.2 Planejamento
+        planejamento = get_supabase(
+            cliente_db, 'finp_planejamento', '*', id_mes_atual, ano_atual
+        )
 
-        result = query.execute()
-        lancamentos = result.data or []
 
-        # ---------- 5. Calcula entradas e saídas ----------
+
+        #! ---------- 5. Calcula entradas e saídas REAIS ----------
         total_entrada = 0.0
         total_saida = 0.0
 
@@ -1027,19 +1057,38 @@ def home_getData(cliente_db, limite=None):
 
             if tipo == 'Entrada':
                 total_entrada += valor
-            elif tipo == 'Saida':
+            elif tipo == 'Saída':
                 total_saida += valor
 
         saldo_mes = total_entrada - total_saida
 
-        # ---------- 6. Percentual gasto ----------
+        #! ---------- 5.1 Calcula entradas e saídas PLANEJAMENTO ----------
+        total_entradaPlan = 0.0
+        total_saidaPlan = 0.0
+
+        for item in planejamento:
+            valorPlan = float(item.get('valor') or 0)
+            tipoPlan = (item.get('tipo') or '').strip()
+
+            if tipoPlan == 'Entrada':
+                total_entradaPlan += valorPlan
+            elif tipoPlan == 'Saída':
+                total_saidaPlan += valorPlan
+
+        # saldo_mes = total_entrada - total_saida
+
+        
+
+
+
+        #! ---------- 6. Percentual gasto ----------
         # Se entrou R$ 1000 e saiu R$ 590 → gastou 59%
         percentual_gasto = 0
         if total_entrada > 0:
             percentual_gasto = round((total_saida / total_entrada) * 100)
 
 
-        # ---------- 7. Retorno ----------
+        #! ---------- 7. Retorno ----------
         return jsonify({
             'nome': nome,
             'avatar': inicial,
@@ -1049,6 +1098,8 @@ def home_getData(cliente_db, limite=None):
             # dados financeiros do mês
             'total_entrada': round(total_entrada, 2),
             'total_saida': round(total_saida, 2),
+            'total_entradaPlan': round(total_entradaPlan, 2),   # se quiser expor
+            'total_saidaPlan': round(total_saidaPlan, 2),
             'saldo_mes': round(saldo_mes, 2),
             'percentual_gasto': percentual_gasto
         }), 200

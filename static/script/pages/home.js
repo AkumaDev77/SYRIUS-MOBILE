@@ -103,6 +103,7 @@ async function carregarHome() {
         elements.balanceTotal.textContent   = fmtBRL(data.saldo_mes);
         elements.balanceIncome.textContent  = fmtBRL(data.total_entrada);
         elements.balanceCurrent.textContent = fmtBRL(data.total_saida);
+        elements.budgetTotalValue.textContent = fmtBRL(data.total_saidaPlan);
 
         const pct = Math.min(Math.max(data.percentual_gasto, 0), 100);
         elements.spentProgressBar.style.width = `${pct}%`;

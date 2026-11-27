@@ -1,32 +1,22 @@
 
 {
-  "id": "/",
-  "name": "Syrius Mobile",
-  "short_name": "Syrius",
-  "description": "Sistema de gestão Syrius",
-  "start_url": "/",
-  "scope": "/",
-  "display": "standalone",
-  "display_override": [
-    "standalone",
-    "fullscreen"
-  ],
-  "background_color": "#1e1e2f",
-  "theme_color": "#1e1e2f",
-  "orientation": "portrait",
-  "prefer_related_applications": false,
-  "icons": [
-    {
-      "src": "/static/icons/icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/static/icons/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    }
-  ]
+    "name": "Syrius Mobile",
+    "short_name": "Syrius",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#1e1e2f",
+    "theme_color": "#1e1e2f",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "/static/icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/static/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
 }

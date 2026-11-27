@@ -1,56 +1,18 @@
+const CACHE_NAME = 'syrius-v1';
 
-const CACHE_NAME = 'syrius-v2';
-
-const urlsToCache = [
-    '/',
-    '/manifest.json',
-    '/static/icons/icon-192x192.png',
-    '/static/icons/icon-512x512.png'
-];
-
-// Instalação
-self.addEventListener('install', event => {
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => cache.addAll(urlsToCache))
-            .then(() => self.skipWaiting())
-    );
+// Instala e já tenta armazenar o básico (mesmo que você não liste tudo)
+self.addEventListener('install', (event) => {
+    self.skipWaiting(); // Força o novo SW a assumir
 });
 
-// Ativação
-self.addEventListener('activate', event => {
-    event.waitUntil(
-        caches.keys()
-            .then(keys => Promise.all(
-                keys
-                    .filter(key => key !== CACHE_NAME)
-                    .map(key => caches.delete(key))
-            ))
-            .then(() => self.clients.claim())
-    );
+// Ativa e limpa caches antigos
+self.addEventListener('activate', (event) => {
+    event.waitUntil(clients.claim());
 });
 
-// Requisições
-self.addEventListener('fetch', event => {
-
-    if (event.request.method !== 'GET') return;
-
-    const url = new URL(event.request.url);
-
-    if (url.origin !== self.location.origin) return;
-
+// Intercepta as requisições (O básico para não dar erro de offline)
+self.addEventListener('fetch', (event) => {
     event.respondWith(
-        fetch(event.request)
-            .then(response => {
-                if (response.ok) {
-                    const clone = response.clone();
-
-                    caches.open(CACHE_NAME)
-                        .then(cache => cache.put(event.request, clone));
-                }
-
-                return response;
-            })
-            .catch(() => caches.match(event.request))
+        fetch(event.request).catch(() => caches.match(event.request))
     );
 });

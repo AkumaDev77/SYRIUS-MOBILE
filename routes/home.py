@@ -1,6 +1,7 @@
+#region IMPORTS E INFORMAÇÕES INICIAIS 
 from flask import (
     Blueprint, render_template, request, redirect,
-    session, flash, url_for, jsonify
+    session, flash, url_for, jsonify,make_response,send_from_directory,current_app
 )
 from datetime import datetime, timedelta
 from database.supabase_client import supabase, criar_cliente_dinamico
@@ -11,8 +12,7 @@ import yfinance as yf
 import re
 from difflib import get_close_matches
 from functools import wraps
-from flask import make_response, send_from_directory, current_app
-
+from collections import defaultdict
 
 home_route = Blueprint('home', __name__)
 
@@ -22,9 +22,7 @@ tentativas_falhas = {}
 MAX_TENTATIVAS = 5
 TEMPO_BLOQUEIO_MINUTOS = 5
 JANELA_RESET_MINUTOS = 15   # se ficar 15 min sem errar, zera a contagem
-
-
-
+#endregion
 
 
 #region DICIONARIO SUPORTE BOT
@@ -967,10 +965,6 @@ def index():
 #region API HOME 
 
 
-
-
-
-
 def home_getData(cliente_db, limite=None):
     try:
         #! ---------- 1. Nome do usuário ----------
@@ -1009,7 +1003,7 @@ def home_getData(cliente_db, limite=None):
             """Busca todas as linhas da tabela paginando via range."""
             registros = []
             offset = 0
-
+            categorias = []
             while True:
                 result = (
                     cliente_db
@@ -1023,6 +1017,7 @@ def home_getData(cliente_db, limite=None):
                 )
                 dados_pagina = result.data or []
 
+
                 if not dados_pagina:
                     break
 
@@ -1034,6 +1029,7 @@ def home_getData(cliente_db, limite=None):
                 offset += page_size
             return registros
 
+        
 
         #!4.1 Movimentos financeiros
         lancamentos = get_supabase(
@@ -1045,11 +1041,11 @@ def home_getData(cliente_db, limite=None):
             cliente_db, 'finp_planejamento', '*', id_mes_atual, ano_atual
         )
 
-
-
-        #! ---------- 5. Calcula entradas e saídas REAIS ----------
+        #! ---------- 5. Calcula entradas e saídas ----------
         total_entrada = 0.0
         total_saida = 0.0
+
+        realizado = defaultdict(float)
 
         for item in lancamentos:
             valor = float(item.get('valor') or 0)
@@ -1060,11 +1056,25 @@ def home_getData(cliente_db, limite=None):
             elif tipo == 'Saída':
                 total_saida += valor
 
+
+
+            #Soma o realizado por (categoria, descricao)
+            if tipo == 'Saída':
+                chave = (item.get('categoria'), item.get('descricao'))
+                realizado[chave] += float(item.get('valor') or 0)
+
+
+
+
+
         saldo_mes = total_entrada - total_saida
 
+
         #! ---------- 5.1 Calcula entradas e saídas PLANEJAMENTO ----------
+
         total_entradaPlan = 0.0
         total_saidaPlan = 0.0
+        orcado = {}
 
         for item in planejamento:
             valorPlan = float(item.get('valor') or 0)
@@ -1072,14 +1082,57 @@ def home_getData(cliente_db, limite=None):
 
             if tipoPlan == 'Entrada':
                 total_entradaPlan += valorPlan
+
             elif tipoPlan == 'Saída':
                 total_saidaPlan += valorPlan
 
-        # saldo_mes = total_entrada - total_saida
 
-        
+            #Indexa o orçado por (categoria, descricao)
+            if tipoPlan == 'Saída':
+                chave = (item.get('categoria'), item.get('descricao'))
+                orcado[chave] = float(item.get('valor') or 0)
 
 
+        todas_chaves = set(orcado) | set(realizado)
+        resultado = []
+        for categoria, descricao in sorted(todas_chaves, key=lambda x: (x[0] or '', x[1] or '')):
+            valor_orcado    = orcado.get((categoria, descricao), 0.0)
+            valor_realizado = realizado.get((categoria, descricao), 0.0)
+            resultado.append({
+                'categoria':       categoria,
+                'descricao':       descricao,
+                'valor_orcado':    round(valor_orcado, 2),
+                'valor_realizado': round(valor_realizado, 2),
+                'saldo':           round(valor_orcado - valor_realizado, 2),
+                'percentual':      round((valor_realizado / valor_orcado * 100), 2) if valor_orcado else None,
+            })
+
+        #! ---------- 5.3 Contagem por categoria ----------
+        # Agrupa realizado/orçado por categoria (somando as descrições)
+        realizado_cat = defaultdict(float)
+        orcado_cat    = defaultdict(float)
+
+        for (categoria, _descricao), v in realizado.items():
+            realizado_cat[categoria] += v
+        for (categoria, _descricao), v in orcado.items():
+            orcado_cat[categoria] += v
+
+        categorias_estouraram = 0
+        categorias_com_sobra  = 0
+        categorias_sem_gasto  = 0
+
+        for cat, vo in orcado_cat.items():
+            if vo <= 0:
+                continue
+            vr = realizado_cat.get(cat, 0.0)
+
+            if vr > vo:
+                categorias_estouraram += 1
+            elif vr < vo:
+                categorias_com_sobra += 1
+
+            if vr == 0:
+                categorias_sem_gasto += 1
 
         #! ---------- 6. Percentual gasto ----------
         # Se entrou R$ 1000 e saiu R$ 590 → gastou 59%
@@ -1101,7 +1154,18 @@ def home_getData(cliente_db, limite=None):
             'total_entradaPlan': round(total_entradaPlan, 2),   # se quiser expor
             'total_saidaPlan': round(total_saidaPlan, 2),
             'saldo_mes': round(saldo_mes, 2),
-            'percentual_gasto': percentual_gasto
+
+            'orcado_realizado': resultado,
+
+            'percentual_gasto': percentual_gasto,
+
+            # contagens
+            'categorias_estouraram': categorias_estouraram,
+            'categorias_com_sobra':  categorias_com_sobra,
+            'categorias_sem_gasto':  categorias_sem_gasto,
+
+
+
         }), 200
 
     except Exception as e:
@@ -1120,12 +1184,6 @@ def api_home():
         return home_getData(cliente_db)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-
-
-
-
-
 
 
 
@@ -1193,6 +1251,8 @@ def login_request():
                 return jsonify({"success": False, "message": msg}), 401
             flash(msg, 'error')
             return redirect(url_for('home.login'))
+
+        
 
         #* 2. Cria o cliente dinâmico (banco do cliente)
         cliente_db = criar_cliente_dinamico(client_url, client_key)

@@ -348,3 +348,150 @@ body {
 @media (prefers-reduced-motion: reduce) {
     .skeleton::after { animation: none; }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ============================================
+   ORÇADO × REALIZADO — accordion de categorias
+   ============================================ */
+
+.categorias-list {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.categorias-empty {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 20px 0;
+}
+
+.categoria {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color .2s ease;
+}
+
+.categoria[open] {
+    border-color: #3a3a3a;
+}
+
+/* Summary = cabeçalho clicável */
+.categoria__summary {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+}
+.categoria__summary::-webkit-details-marker { display: none; }
+
+/* Donut + ícone sobreposto */
+.categoria__donut {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+}
+
+.categoria__icon {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    font-size: 16px;
+}
+
+/* Bloco de texto */
+.categoria__info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.categoria__nome {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.categoria__valores {
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.categoria__de {
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+.categoria__pct {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding: 4px 8px;
+    border-radius: 8px;
+    background-color: var(--bg-card-darker);
+    flex: 0 0 auto;
+}
+.categoria__pct.is-over {
+    color: var(--accent-red);
+}
+
+/* Descrições (subcategorias) */
+.categoria__descricoes {
+    padding: 4px 16px 12px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.descricao {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.82rem;
+    padding: 6px 0;
+}
+
+.descricao__nome {
+    color: var(--text-secondary);
+}
+
+.descricao__valores {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.descricao__de {
+    color: var(--text-secondary);
+    font-weight: 400;
+    font-size: 0.75rem;
+}

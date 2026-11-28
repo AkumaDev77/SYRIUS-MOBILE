@@ -624,7 +624,9 @@ def _criar_lancamento_db(cliente_db, dados):
                              f"🏷️ {dados.get('categoria')} &gt; {dados.get('grupo')}<br>"
                              f"📋 Tipo: {tipo_cadastro} | Natureza: {natureza_cadastro}<br>"
                              f"🆔 ID: {result.data[0]['id']}{observacao_texto}<br><br>"
-                             f"🔎 {msg_match}",
+                            #  f"🔎 {msg_match}"
+                             f"Mas aqui, sabe onde sua ex ta agora?"
+                             f"<p> MAMANDO!</p>",
                     'tipo': 'sucesso',
                     'dados': result.data[0]
                 }
